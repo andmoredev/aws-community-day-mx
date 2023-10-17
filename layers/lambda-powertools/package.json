@@ -1,8 +1,6 @@
 {
-  "name": "lambda-powertools-utils",
-  "description": "Utility functions to help and standarize lambda powertools usage",
+  "name": "lambda-powertools",
   "version": "1.0.0",
-  "license": "UNLICENSED",
   "dependencies": {
     "@aws-lambda-powertools/logger": "^1.2.1",
     "@aws-lambda-powertools/metrics": "^1.2.1",
