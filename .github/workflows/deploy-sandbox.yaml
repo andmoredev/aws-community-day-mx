@@ -94,3 +94,11 @@ jobs:
 
           echo "### Generated URLs" >> $GITHUB_STEP_SUMMARY
           echo "API $url" >> $GITHUB_STEP_SUMMARY
+
+  test-api:
+    name: Test API
+    needs: [get-api-url]
+    uses: ./.github/workflows/shared-test-api.yaml
+    with:
+      BASE_URL: ${{ needs.get-api-url.outputs.BASE_URL }}
+    secrets: inherit
