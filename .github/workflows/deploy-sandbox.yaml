@@ -58,6 +58,19 @@ jobs:
           echo "TABLE_NAME=$prNumber" >> $GITHUB_OUTPUT
           echo "### Table Name (Dependabot) $prNumber" >> $GITHUB_STEP_SUMMARY
 
+  determine-if-openapi-changed:
+    name: Did OpenAPI Change
+    runs-on: ubuntu-latest
+    outputs:
+      openapi: ${{ steps.determine-if-openapi-changed.outputs.openapi }}
+    steps:
+    - uses: actions/checkout@v3
+    - uses: dorny/paths-filter@v2
+      id: determine-if-openapi-changed
+      with:
+        filters: |
+          openapi: 'openapi.yaml'
+
   deploy-api:
     name: Deploy API
     needs: [predeploy-validations, get-parameter-data]
@@ -67,6 +80,19 @@ jobs:
       STACK_NAME: ${{ needs.get-parameter-data.outputs.STACK_NAME }}
       TABLE_NAME: ${{ needs.get-parameter-data.outputs.TABLE_NAME }}
     secrets: inherit
+
+  generate-js-sdk:
+    if: ${{ needs.determine-if-openapi-changed.outputs.openapi == 'true' }}
+    name: Generate JS SDK
+    runs-on: ubuntu-latest
+    needs: [determine-if-openapi-changed]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Generate Node SDK
+        uses: openapi-generators/openapitools-generator-action@v1.3.0
+        with:
+          generator: typescript-node
+          openapi-file: openapi.yaml
 
   get-api-url:
     name: Get API Url
