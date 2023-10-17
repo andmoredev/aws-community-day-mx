@@ -3,6 +3,9 @@ name: Deploy API
 on:
   workflow_call:
     inputs:
+      WORKFLOW_ENV:
+        type: string
+        required: true
       AWS_REGION:
         type: string
         required: true
@@ -30,6 +33,7 @@ jobs:
   build-and-deploy:
     name: Build and Deploy SAM Application
     runs-on: ubuntu-latest
+    environment: ${{ inputs.WORKFLOW_ENV }}
     steps:
       - uses: actions/checkout@v3
 

@@ -72,4 +72,3 @@ jobs:
       CLOUDFORMATION_EXECUTION_ROLE: b
       ARTIFACTS_BUCKET_NAME: c
     secrets: inherit
-
