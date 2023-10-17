@@ -1,0 +1,75 @@
+name: Deploy Sandbox
+run-name: Deploy ${{ github.event_name == 'workflow_dispatch' && github.ref_name || github.event_name == 'pull_request' && github.head_ref }} to Sandbox
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - master
+
+concurrency:
+  group: ${{ github.event_name == 'workflow_dispatch' && github.ref_name || github.event_name == 'pull_request' && github.head_ref }}
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  STACK_NAME: math-operation-service
+  BRANCH_NAME: ${{ github.event_name == 'workflow_dispatch' && github.ref_name || github.event_name == 'pull_request' && github.head_ref }}
+
+jobs:
+  predeploy-validations:
+    name: Pre-deploy validations
+    uses: ./.github/workflows/shared-predeploy-validations.yaml
+
+  get-parameter-data:
+    name: Get Branch Name
+    runs-on: ubuntu-latest
+    outputs:
+      STACK_NAME: ${{ steps.get-parameter-data-step.outputs.STACK_NAME || steps.dependabot-get-parameter-data-step.outputs.STACK_NAME }}
+      TABLE_NAME: ${{ steps.get-parameter-data-step.outputs.TABLE_NAME || steps.dependabot-get-parameter-data-step.outputs.TABLE_NAME }}
+    steps:
+      - name: Get the data to be used as the parameters for the stack
+        if: ${{ github.actor != 'dependabot[bot]' }}
+        id: get-parameter-data-step
+        run: |
+          cleanedBranchName=$(echo "$BRANCH_NAME" | sed 's/[^a-zA-Z0-9_.-]/-/g')
+          stackNamePlusBranchName=$STACK_NAME-$cleanedBranchName
+
+          truncatedStackName="${stackNamePlusBranchName:0:128}"
+
+          echo "STACK_NAME=$truncatedStackName" >> $GITHUB_OUTPUT
+          echo "### Stack Name $truncatedStackName" >> $GITHUB_STEP_SUMMARY
+
+          echo "TABLE_NAME=$truncatedStackName" >> $GITHUB_OUTPUT
+          echo "### Table Name $truncatedStackName" >> $GITHUB_STEP_SUMMARY
+
+
+      - name: Get the data to be used as the parameters for the stack (dependabot)
+        if: ${{ github.actor == 'dependabot[bot]' && github.event_name == 'pull_request' }}
+        id: dependabot-get-parameter-data-step
+        run: |
+          prNumber=$(echo "pr-${{ github.event.number }}")
+
+          echo "STACK_NAME=$prNumber" >> $GITHUB_OUTPUT
+          echo "### Stack Name (Dependabot) $prNumber" >> $GITHUB_STEP_SUMMARY
+
+          echo "TABLE_NAME=$prNumber" >> $GITHUB_OUTPUT
+          echo "### Table Name (Dependabot) $prNumber" >> $GITHUB_STEP_SUMMARY
+
+
+  deploy-api:
+    name: Deploy API
+    needs: [predeploy-validations, get-parameter-data]
+    uses: ./.github/workflows/shared-deploy-api.yaml
+    with:
+      WORKFLOW_ENV: sandbox
+      AWS_REGION: us-east-1
+      STACK_NAME: ${{ needs.get-parameter-data.outputs.STACK_NAME }}
+      TABLE_NAME: ${{ needs.get-parameter-data.outputs.TABLE_NAME }}
+      PIPELINE_EXECUTION_ROLE: a
+      CLOUDFORMATION_EXECUTION_ROLE: b
+      ARTIFACTS_BUCKET_NAME: c
+    secrets: inherit
+
