@@ -65,10 +65,6 @@ jobs:
     uses: ./.github/workflows/shared-deploy-api.yaml
     with:
       WORKFLOW_ENV: sandbox
-      AWS_REGION: us-east-1
       STACK_NAME: ${{ needs.get-parameter-data.outputs.STACK_NAME }}
       TABLE_NAME: ${{ needs.get-parameter-data.outputs.TABLE_NAME }}
-      PIPELINE_EXECUTION_ROLE: a
-      CLOUDFORMATION_EXECUTION_ROLE: b
-      ARTIFACTS_BUCKET_NAME: c
     secrets: inherit

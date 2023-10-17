@@ -6,18 +6,6 @@ on:
       WORKFLOW_ENV:
         type: string
         required: true
-      AWS_REGION:
-        type: string
-        required: true
-      PIPELINE_EXECUTION_ROLE:
-        type: string
-        required: true
-      CLOUDFORMATION_EXECUTION_ROLE:
-        type: string
-        required: true
-      ARTIFACTS_BUCKET_NAME:
-        type: string
-        required: true
       STACK_NAME:
         type: string
         required: true
@@ -40,8 +28,8 @@ jobs:
       - name: Configure AWS
         uses: aws-actions/configure-aws-credentials@v2
         with:
-          aws-region: ${{ inputs.AWS_REGION }}
-          role-to-assume: ${{ inputs.PIPELINE_EXECUTION_ROLE }}
+          aws-region: ${{ vars.AWS_REGION }}
+          role-to-assume: ${{ secrets.PIPELINE_EXECUTION_ROLE }}
           role-session-name: discovery-deploy
           role-duration-seconds: 3600
           role-skip-session-tagging: true
@@ -61,6 +49,6 @@ jobs:
           sam deploy \
           --config-file samconfig.ci.toml \
           --config-env api \
-          --s3-bucket ${{ inputs.ARTIFACTS_BUCKET_NAME }} \
+          --s3-bucket ${{ secrets.ARTIFACTS_BUCKET_NAME }} \
           --no-fail-on-empty-changeset \
-          --role-arn ${{ inputs.CLOUDFORMATION_EXECUTION_ROLE }}
+          --role-arn ${{ secrets.CLOUDFORMATION_EXECUTION_ROLE }}
