@@ -29,7 +29,7 @@ describe('Addition', () => {
       expect(response).to.have.property('statusCode', 200);
       expect(response).to.have.property('body');
       const body = JSON.parse(response.body);
-      expect(body).to.have.property('result', 30);
+      expect(body).to.have.property('result', 1001);
       expect(body).to.have.property('warning', 'The result is greater than 1000.');
     });
   });

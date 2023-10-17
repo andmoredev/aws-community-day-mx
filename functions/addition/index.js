@@ -12,7 +12,6 @@ exports.handler = initializePowertools(async (event) => {
     body: JSON.stringify({
       result,
       ...(result > 1000) && { warning: 'The result is greater than 1000.' }
-
     })
   };
 });

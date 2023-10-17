@@ -12,7 +12,6 @@ exports.handler = initializePowertools(async (event) => {
     body: JSON.stringify({
       result,
       ...(result < -500) && { warning: 'The result is less than -500.' }
-
     })
   };
 });
