@@ -58,7 +58,6 @@ jobs:
           echo "TABLE_NAME=$prNumber" >> $GITHUB_OUTPUT
           echo "### Table Name (Dependabot) $prNumber" >> $GITHUB_STEP_SUMMARY
 
-
   deploy-api:
     name: Deploy API
     needs: [predeploy-validations, get-parameter-data]
@@ -68,3 +67,30 @@ jobs:
       STACK_NAME: ${{ needs.get-parameter-data.outputs.STACK_NAME }}
       TABLE_NAME: ${{ needs.get-parameter-data.outputs.TABLE_NAME }}
     secrets: inherit
+
+  get-api-url:
+    name: Get API Url
+    needs: [deploy-api, get-parameter-data]
+    runs-on: ubuntu-latest
+    environment: sandbox
+    outputs:
+      BASE_URL: ${{ steps.getUrl.outputs.BASE_URL }}
+    steps:
+      - name: Configure AWS
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-region: ${{ vars.AWS_REGION }}
+          role-to-assume: ${{ secrets.PIPELINE_EXECUTION_ROLE }}
+          role-session-name: get-api-url
+          role-duration-seconds: 3600
+          role-skip-session-tagging: true
+      - id: getUrl
+        name: Get Url
+        run: |
+          url=$(aws cloudformation describe-stacks --stack-name ${{ needs.get-parameter-data.outputs.STACK_NAME }} --query "Stacks[0].Outputs[?OutputKey=='ApiURL'].OutputValue" --output text)
+          echo $url
+
+          echo "BASE_URL=$url" >> "$GITHUB_OUTPUT"
+
+          echo "### Generated URLs" >> $GITHUB_STEP_SUMMARY
+          echo "API $url" >> $GITHUB_STEP_SUMMARY
