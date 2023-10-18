@@ -34,7 +34,7 @@ jobs:
     name: Get API Url
     needs: [deploy-api]
     runs-on: ubuntu-latest
-    environment: sandbox
+    environment: qa
     outputs:
       BASE_URL: ${{ steps.getUrl.outputs.BASE_URL }}
     steps:
