@@ -12,7 +12,7 @@ tags:
     description: Math Operations
 
 servers:
-  - url: replace with real url
+  - url: fake url
     description: some base url
 
 x-amazon-apigateway-request-validators:
