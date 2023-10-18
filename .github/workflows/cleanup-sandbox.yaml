@@ -47,9 +47,10 @@ jobs:
         id: dependabot-get-stack-name-step
         run: |
           prNumber=$(echo "pr-${{ github.event.number }}")
+          stackNamePlusPrNumber=$STACK_NAME-$prNumber
 
-          echo "STACK_NAME=$prNumber" >> $GITHUB_OUTPUT
-          echo "### Stack Name (Dependabot) $prNumber" >> $GITHUB_STEP_SUMMARY
+          echo "STACK_NAME=$stackNamePlusPrNumber" >> $GITHUB_OUTPUT
+          echo "### Stack Name (Dependabot) $stackNamePlusPrNumber" >> $GITHUB_STEP_SUMMARY
 
   cleanup-resources:
     name: Delete Sandbox Resources
