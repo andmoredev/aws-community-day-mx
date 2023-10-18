@@ -11,9 +11,6 @@ on:
         type: string
         required: true
 
-concurrency:
-  group: ${{ github.event_name == 'workflow_dispatch' && github.ref_name ||  github.event_name == 'pull_request' && github.head_ref }}
-
 permissions:
   id-token: write
   contents: read

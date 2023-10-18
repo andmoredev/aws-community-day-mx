@@ -8,9 +8,6 @@ env:
   STACK_NAME: math-operation-service
   BRANCH_NAME: ${{ github.ref_name }}
 
-concurrency:
-  group: ${{ github.workflow }}
-
 permissions:
   id-token: write
   contents: read
