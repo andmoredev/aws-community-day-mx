@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
   pull_request:
     branches:
-      - master
+      - main
 
 concurrency:
   group: ${{ github.event_name == 'workflow_dispatch' && github.ref_name || github.event_name == 'pull_request' && github.head_ref }}
@@ -44,7 +44,6 @@ jobs:
 
           echo "TABLE_NAME=$truncatedStackName" >> $GITHUB_OUTPUT
           echo "### Table Name $truncatedStackName" >> $GITHUB_STEP_SUMMARY
-
 
       - name: Get the data to be used as the parameters for the stack (dependabot)
         if: ${{ github.actor == 'dependabot[bot]' && github.event_name == 'pull_request' }}
