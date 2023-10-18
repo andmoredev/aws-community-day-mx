@@ -26,6 +26,9 @@ jobs:
   get-parameter-data:
     name: Get Branch Name
     runs-on: ubuntu-latest
+    outputs:
+      STACK_NAME: ${{ steps.get-parameter-data-step.outputs.STACK_NAME || steps.dependabot-get-parameter-data-step.outputs.STACK_NAME }}
+      TABLE_NAME: ${{ steps.get-parameter-data-step.outputs.TABLE_NAME || steps.dependabot-get-parameter-data-step.outputs.TABLE_NAME }}
     steps:
       - name: Get the data to be used as the parameters for the stack
         if: ${{ github.actor != 'dependabot[bot]' }}
@@ -36,10 +39,10 @@ jobs:
 
           truncatedStackName="${stackNamePlusBranchName:0:128}"
 
-          echo "STACK_NAME=$truncatedStackName" >> $GITHUB_ENV
+          echo "STACK_NAME=$truncatedStackName" >> $GITHUB_OUTPUT
           echo "### Stack Name $truncatedStackName" >> $GITHUB_STEP_SUMMARY
 
-          echo "TABLE_NAME=$truncatedStackName" >> $GITHUB_ENV
+          echo "TABLE_NAME=$truncatedStackName" >> $GITHUB_OUTPUT
           echo "### Table Name $truncatedStackName" >> $GITHUB_STEP_SUMMARY
 
 
@@ -49,10 +52,10 @@ jobs:
         run: |
           prNumber=$(echo "pr-${{ github.event.number }}")
 
-          echo "STACK_NAME=$prNumber" >> $GITHUB_ENV
+          echo "STACK_NAME=$prNumber" >> $GITHUB_OUTPUT
           echo "### Stack Name (Dependabot) $prNumber" >> $GITHUB_STEP_SUMMARY
 
-          echo "TABLE_NAME=$prNumber" >> $GITHUB_ENV
+          echo "TABLE_NAME=$prNumber" >> $GITHUB_OUTPUT
           echo "### Table Name (Dependabot) $prNumber" >> $GITHUB_STEP_SUMMARY
 
   determine-if-openapi-changed:
@@ -61,7 +64,7 @@ jobs:
     outputs:
       openapi: ${{ steps.determine-if-openapi-changed.outputs.openapi }}
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v3
     - uses: dorny/paths-filter@v2
       id: determine-if-openapi-changed
       with:
@@ -74,8 +77,8 @@ jobs:
     uses: ./.github/workflows/shared-deploy-api.yaml
     with:
       WORKFLOW_ENV: sandbox
-      STACK_NAME: ${{ env.STACK_NAME }}
-      TABLE_NAME: ${{ env.TABLE_NAME }}
+      STACK_NAME: ${{ needs.get-parameter-data.outputs.STACK_NAME }}
+      TABLE_NAME: ${{ needs.get-parameter-data.outputs.TABLE_NAME }}
     secrets: inherit
 
   generate-js-sdk:
@@ -96,6 +99,8 @@ jobs:
     needs: [deploy-api, get-parameter-data]
     runs-on: ubuntu-latest
     environment: sandbox
+    outputs:
+      BASE_URL: ${{ steps.getUrl.outputs.BASE_URL }}
     steps:
       - name: Configure AWS
         uses: aws-actions/configure-aws-credentials@v4
@@ -111,7 +116,7 @@ jobs:
           url=$(aws cloudformation describe-stacks --stack-name ${{ needs.get-parameter-data.outputs.STACK_NAME }} --query "Stacks[0].Outputs[?OutputKey=='ApiURL'].OutputValue" --output text)
           echo $url
 
-          echo "BASE_URL=$url" >> "$GITHUB_ENV"
+          echo "BASE_URL=$url" >> "$GITHUB_OUTPUT"
 
           echo "### Generated URLs" >> $GITHUB_STEP_SUMMARY
           echo "API $url" >> $GITHUB_STEP_SUMMARY
@@ -121,5 +126,5 @@ jobs:
     needs: [get-api-url]
     uses: ./.github/workflows/shared-test-api.yaml
     with:
-      BASE_URL: ${{ env.BASE_URL }}
+      BASE_URL: ${{ needs.get-api-url.outputs.BASE_URL }}
     secrets: inherit
