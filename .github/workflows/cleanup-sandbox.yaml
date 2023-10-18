@@ -73,6 +73,6 @@ jobs:
       - name: Delete Stack
         run: |
           sam delete \
-          --stack-name $STACK_NAME \
+          --stack-name ${{ needs.get-stack-name.outputs.STACK_NAME }} \
           --region ${{ vars.AWS_REGION }} \
           --no-prompts
