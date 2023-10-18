@@ -91,10 +91,13 @@ jobs:
         with:
           generator: typescript-node
           openapi-file: openapi.yaml
-      - run: |
+      - env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
           cd typescript-node-client
-          ls
           npm install
+          npm publish
+          ls
 
   get-api-url:
     name: Get API Url
