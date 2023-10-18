@@ -92,9 +92,8 @@ jobs:
           generator: typescript-node
           openapi-file: openapi.yaml
       - run: |
-          ls
           cd typescript-node-client
-          cat git_push.sh
+          ls
 
   get-api-url:
     name: Get API Url
