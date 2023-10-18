@@ -27,13 +27,14 @@ jobs:
       with:
         WORKFLOW_ENV: qa
         STACK_NAME: math-operation-service
+        TABLE_NAME: math-operation-history
       secrets: inherit
 
   get-api-url:
     name: Get API Url
     needs: [deploy-api]
     runs-on: ubuntu-latest
-    environment: sandbox
+    environment: qa
     outputs:
       BASE_URL: ${{ steps.getUrl.outputs.BASE_URL }}
     steps:
@@ -48,7 +49,7 @@ jobs:
       - id: getUrl
         name: Get Url
         run: |
-          url=$(aws cloudformation describe-stacks --stack-name ${{ needs.get-parameter-data.outputs.STACK_NAME }} --query "Stacks[0].Outputs[?OutputKey=='ApiURL'].OutputValue" --output text)
+          url=$(aws cloudformation describe-stacks --stack-name ${{ env.STACK_NAME }} --query "Stacks[0].Outputs[?OutputKey=='ApiURL'].OutputValue" --output text)
           echo $url
 
           echo "BASE_URL=$url" >> "$GITHUB_OUTPUT"
