@@ -23,10 +23,10 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ inputs.WORKFLOW_ENV }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Configure AWS
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: ${{ vars.AWS_REGION }}
           role-to-assume: ${{ secrets.PIPELINE_EXECUTION_ROLE }}
