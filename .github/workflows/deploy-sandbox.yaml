@@ -98,8 +98,8 @@ jobs:
         run: |
           cd typescript-node-client
           npm install
-          npm publish
           ls
+          npm publish
 
   get-api-url:
     name: Get API Url
