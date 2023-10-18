@@ -63,7 +63,7 @@ jobs:
     outputs:
       openapi: ${{ steps.determine-if-openapi-changed.outputs.openapi }}
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v2
     - uses: dorny/paths-filter@v2
       id: determine-if-openapi-changed
       with:
@@ -126,4 +126,44 @@ jobs:
     uses: ./.github/workflows/shared-test-api.yaml
     with:
       BASE_URL: ${{ needs.get-api-url.outputs.BASE_URL }}
+    secrets: inherit
+
+  auto-merge-dependabot-update:
+    name: Auto Merge Dependabot Update
+    needs: [test-api]
+    if: ${{ github.actor == 'dependabot[bot]' && github.event_name == 'pull_request' }}
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: write
+    steps:
+      - name: Dependabot metadata
+        id: dependabot-metadata
+        uses: dependabot/fetch-metadata@v1
+      - uses: actions/checkout@v3
+      - name: Approve a PR if not already approved
+        if: ${{ steps.dependabot-metadata.outputs.update-type == 'version-update:semver-minor' || steps.dependabot-metadata.outputs.update-type == 'version-update:semver-patch' || steps.dependabot-metadata.outputs.package-ecosystem == 'github_actions' }}
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr checkout "$PR_URL" # sets the upstream metadata for `gh pr status`
+
+          if [ "$(gh pr status --json reviewDecision -q .currentBranch.reviewDecision)" != "APPROVED" ]; then
+            gh pr review --approve "$PR_URL"
+          fi
+
+          gh pr merge --auto --merge "$PR_URL"
+
+  cleanup-dependabot-stack:
+    name: Cleanup dependabot stack
+    needs: [get-parameter-data, auto-merge-dependabot-update]
+    if: ${{ github.actor == 'dependabot[bot]' && github.event_name == 'pull_request' }}
+    uses: ./.github/workflows/cleanup-sandbox.yaml
+    permissions:
+      pull-requests: write
+      contents: read
+      id-token: write
+    with:
+      STACK_NAME: ${{ needs.get-parameter-data.outputs.STACK_NAME }}
     secrets: inherit
