@@ -62,6 +62,7 @@ jobs:
       openapi: ${{ steps.determine-if-openapi-changed.outputs.openapi }}
     steps:
     - uses: actions/checkout@v4
+    
     - uses: dorny/paths-filter@v2
       id: determine-if-openapi-changed
       with:
