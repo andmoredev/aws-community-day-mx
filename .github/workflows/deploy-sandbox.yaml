@@ -47,12 +47,13 @@ jobs:
         id: dependabot-get-parameter-data-step
         run: |
           prNumber=$(echo "pr-${{ github.event.number }}")
+          stackNamePlusPrNumber=$STACK_NAME-$prNumber
 
-          echo "STACK_NAME=$prNumber" >> $GITHUB_OUTPUT
-          echo "### Stack Name (Dependabot) $prNumber" >> $GITHUB_STEP_SUMMARY
+          echo "STACK_NAME=$stackNamePlusPrNumber" >> $GITHUB_OUTPUT
+          echo "### Stack Name (Dependabot) $stackNamePlusPrNumber" >> $GITHUB_STEP_SUMMARY
 
-          echo "TABLE_NAME=$prNumber" >> $GITHUB_OUTPUT
-          echo "### Table Name (Dependabot) $prNumber" >> $GITHUB_STEP_SUMMARY
+          echo "TABLE_NAME=$stackNamePlusPrNumber" >> $GITHUB_OUTPUT
+          echo "### Table Name (Dependabot) $stackNamePlusPrNumber" >> $GITHUB_STEP_SUMMARY
 
   determine-if-openapi-changed:
     name: Did OpenAPI Change
