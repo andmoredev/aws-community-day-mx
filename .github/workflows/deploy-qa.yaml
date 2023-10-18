@@ -27,6 +27,7 @@ jobs:
       with:
         WORKFLOW_ENV: qa
         STACK_NAME: math-operation-service
+        TABLE_NAME: math-operation-history
       secrets: inherit
 
   get-api-url:
