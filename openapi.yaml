@@ -128,9 +128,9 @@ paths:
                     type: number
                   warning:
                     type: string
-                    description: Warning when result is less than -1000
+                    description: Warning when result is less than -500
                     enum:
-                      - The result is less than -1000.
+                      - The result is less than -500.
         '400':
           description: Invalid data provided
           content:
