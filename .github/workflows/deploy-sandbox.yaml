@@ -94,6 +94,7 @@ jobs:
       - run: |
           cd typescript-node-client
           ls
+          npm install
 
   get-api-url:
     name: Get API Url
