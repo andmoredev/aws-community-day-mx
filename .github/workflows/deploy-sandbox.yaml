@@ -91,6 +91,8 @@ jobs:
         with:
           generator: typescript-node
           openapi-file: openapi.yaml
+          command-args: --additional-properties="npmName=aws-community-day-mx-node,npmVersion=1.0.0"
+
       - env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
