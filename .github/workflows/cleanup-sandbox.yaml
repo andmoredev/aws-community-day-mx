@@ -20,6 +20,7 @@ permissions:
   pull-requests: read
 
 env:
+  STACK_NAME: math-operation-service
   BRANCH_NAME: ${{ github.event_name == 'pull_request' && github.actor == 'dependabot[bot]' && inputs.STACK_NAME || github.event_name == 'workflow_dispatch' && github.ref_name || github.event_name == 'pull_request' && github.head_ref }}
 
 jobs:
