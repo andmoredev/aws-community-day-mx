@@ -110,8 +110,8 @@ jobs:
           cd typescript-node-client
           npm install
           cat package.json
-
-          # npm publish
+          npm version prerelease --preid dev
+          npm publish
 
   get-api-url:
     name: Get API Url
