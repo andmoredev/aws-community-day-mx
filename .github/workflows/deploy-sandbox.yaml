@@ -12,6 +12,8 @@ permissions:
   contents: read
 
 env:
+  PACKAGE_NAME: aws-community-day-mx-node
+  PACKAGE_VERSION: 1.0.0
   STACK_NAME: math-operation-service
   BRANCH_NAME: ${{ github.event_name == 'workflow_dispatch' && github.ref_name || github.event_name == 'pull_request' && github.head_ref }}
 
@@ -86,6 +88,11 @@ jobs:
     needs: [determine-if-openapi-changed]
     steps:
       - uses: actions/checkout@v4
+
+      - run: |
+          packageVersion=$(npm view aws-community-day-mx-node version)
+          echo "PACKAGE_VERSION=$packageVersion" >> $GITHUB_ENV
+
       - uses: actions/setup-node@v3
         with:
           registry-url: 'https://registry.npmjs.org'
@@ -95,15 +102,16 @@ jobs:
         with:
           generator: typescript-node
           openapi-file: openapi.yaml
-          command-args: --additional-properties="npmName=aws-community-day-mx-node,npmVersion=1.0.0"
+          command-args: --additional-properties="npmName=${{ env.PACKAGE_NAME }},npmVersion=${{ env.PACKAGE_VERSION }}"
 
       - env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           cd typescript-node-client
           npm install
-          ls
-          npm publish
+          cat package.json
+
+          # npm publish
 
   get-api-url:
     name: Get API Url
