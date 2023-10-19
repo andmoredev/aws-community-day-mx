@@ -86,6 +86,10 @@ jobs:
     needs: [determine-if-openapi-changed]
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
+        with:
+          registry-url: 'https://registry.npmjs.org'
+
       - name: Generate Node SDK
         uses: openapi-generators/openapitools-generator-action@v1.5.0
         with:
