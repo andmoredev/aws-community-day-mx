@@ -8,7 +8,7 @@
     "@middy/core": "^4.6.5"
   },
   "devDependencies": {
-    "@apideck/portman": "^1.18.0",
+    "@apideck/portman": "^1.23.1",
     "eslint": "^8.28.0",
     "eslint-config-google": "^0.14.0",
     "@stoplight/spectral-cli": "^6.4.1",
