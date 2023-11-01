@@ -15,7 +15,7 @@ permissions:
 jobs:
   predeploy-validations:
     name: Pre-deploy validations
-    uses: ./.github/workflows/shared-predeploy-validations.yaml
+    uses: ./.github/workflows/shared-pre-deploy-validations.yaml
 
   deploy-api:
       name: Deploy API
@@ -54,10 +54,10 @@ jobs:
           echo "### Generated URLs" >> $GITHUB_STEP_SUMMARY
           echo "API $url" >> $GITHUB_STEP_SUMMARY
 
-  test-api:
-    name: Test API
+  postdeploy-validations:
+    name: Post-deploy validations
     needs: [get-api-url]
-    uses: ./.github/workflows/shared-test-api.yaml
+    uses: ./.github/workflows/shared-post-deploy-validations.yaml
     with:
       BASE_URL: ${{ needs.get-api-url.outputs.BASE_URL }}
     secrets: inherit

@@ -12,8 +12,8 @@ tags:
     description: Math Operations
 
 servers:
-  - url: replace with real url
-    description: some base url
+  - url: https://x5no5m39nc.execute-api.us-east-1.amazonaws.com/api
+    description: QA
 
 x-amazon-apigateway-request-validators:
   Validate body, query string parameters, and headers:
