@@ -12,8 +12,8 @@ tags:
     description: Math Operations
 
 servers:
-  - url: https://x5no5m39nc.execute-api.us-east-1.amazonaws.com/api
-    description: QA
+  - url: Math Operation Service
+    description: https://operations.andmore.dev/api
 
 x-amazon-apigateway-request-validators:
   Validate body, query string parameters, and headers:
@@ -48,6 +48,9 @@ paths:
           application/json:
             schema:
               type: object
+              required:
+                - number1
+                - number2
               properties:
                 number1:
                   type: number
@@ -105,6 +108,9 @@ paths:
           application/json:
             schema:
               type: object
+              required:
+                - number1
+                - number2
               properties:
                 number1:
                   type: number
