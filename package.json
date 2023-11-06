@@ -9,7 +9,7 @@
   },
   "devDependencies": {
     "@apideck/portman": "^1.23.1",
-    "eslint": "^8.52.0",
+    "eslint": "^8.53.0",
     "eslint-config-google": "^0.14.0",
     "@stoplight/spectral-cli": "^6.4.1",
     "aws-sdk-client-mock": "^3.0.0",
