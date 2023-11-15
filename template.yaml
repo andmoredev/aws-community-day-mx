@@ -51,12 +51,12 @@ Resources:
   LambdaPowertoolsLayer:
     Type: AWS::Serverless::LayerVersion
     Metadata:
-      BuildMethod: nodejs18.x
+      BuildMethod: nodejs20.x
     Properties:
       LayerName: lambda-powertools-layer
       ContentUri: layers/lambda-powertools
       CompatibleRuntimes:
-        - nodejs18.x
+        - nodejs20.x
 
   AdditionFunction:
     Type: AWS::Serverless::Function
