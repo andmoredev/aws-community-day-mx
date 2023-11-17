@@ -4,7 +4,7 @@
   "dependencies": {
     "@aws-lambda-powertools/logger": "^1.15.0",
     "@aws-lambda-powertools/metrics": "^1.15.0",
-    "@aws-lambda-powertools/tracer": "^1.15.0",
+    "@aws-lambda-powertools/tracer": "^1.16.0",
     "@middy/core": "^4.7.0",
     "axios": "^1.6.2"
   },
