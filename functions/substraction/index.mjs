@@ -1,4 +1,4 @@
-exports.handler = async (event) => {
+export const handler = async (event) => {
   const input = JSON.parse(event.body);
   const { number1, number2 } = input;
 
