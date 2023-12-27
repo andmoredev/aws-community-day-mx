@@ -1,10 +1,10 @@
-const app = require('../index.js');
-const { expect } = require('chai');
+import { expect } from 'chai';
+import { handler } from '../index.mjs';
 
 describe('Substraction', () => {
   describe('handler', () => {
     it('Success - no warning', async () => {
-      const response = await app.handler({
+      const response = await handler({
         body: JSON.stringify({
           number1: 30,
           number2: 20
@@ -19,7 +19,7 @@ describe('Substraction', () => {
     });
 
     it('Success - no warning - result is negative', async () => {
-      const response = await app.handler({
+      const response = await handler({
         body: JSON.stringify({
           number1: 20,
           number2: 30
@@ -34,7 +34,7 @@ describe('Substraction', () => {
     });
 
     it('Success - with warning', async () => {
-      const response = await app.handler({
+      const response = await handler({
         body: JSON.stringify({
           number1: 499,
           number2: 1000

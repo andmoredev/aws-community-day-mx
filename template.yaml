@@ -11,11 +11,8 @@ Globals:
   Function:
     Tracing: Active
     Timeout: 10
-    Runtime: nodejs18.x
+    Runtime: nodejs20.x
     MemorySize: 128
-    Handler: index.handler
-    Layers:
-      - !Ref LambdaPowertoolsLayer
     Architectures:
       - arm64
 
@@ -48,20 +45,11 @@ Resources:
           Parameters:
             Location: ./openapi.yaml
 
-  LambdaPowertoolsLayer:
-    Type: AWS::Serverless::LayerVersion
-    Metadata:
-      BuildMethod: nodejs20.x
-    Properties:
-      LayerName: lambda-powertools-layer
-      ContentUri: layers/lambda-powertools
-      CompatibleRuntimes:
-        - nodejs20.x
-
   AdditionFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: functions/addition
+      CodeUri: functions
+      Handler: addition/index.handler
       Events:
         AdditionEvent:
           Type: Api
@@ -75,7 +63,8 @@ Resources:
   SubstractionFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: functions/substraction
+      CodeUri: functions
+      Handler: substraction/index.handler
       Events:
         SubstractionEvent:
           Type: Api

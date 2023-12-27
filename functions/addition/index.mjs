@@ -1,8 +1,4 @@
-const { initializePowertools } = process.env.LAMBDA_TASK_ROOT ?
-  require('/opt/nodejs/lambda-powertools') :
-  require('../../layers/lambda-powertools/lambda-powertools');
-
-exports.handler = initializePowertools(async (event) => {
+export const handler = async (event) => {
   const input = JSON.parse(event.body);
   const { number1, number2 } = input;
 
@@ -14,4 +10,4 @@ exports.handler = initializePowertools(async (event) => {
       ...(result > 1000) && { warning: 'The result is greater than 1000.' }
     })
   };
-});
+};
