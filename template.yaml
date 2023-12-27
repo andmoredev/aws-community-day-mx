@@ -14,8 +14,6 @@ Globals:
     Runtime: nodejs20.x
     MemorySize: 128
     Handler: index.handler
-    Layers:
-      - !Ref LambdaPowertoolsLayer
     Architectures:
       - arm64
 
@@ -47,16 +45,6 @@ Resources:
           Name: AWS::Include
           Parameters:
             Location: ./openapi.yaml
-
-  LambdaPowertoolsLayer:
-    Type: AWS::Serverless::LayerVersion
-    Metadata:
-      BuildMethod: nodejs20.x
-    Properties:
-      LayerName: lambda-powertools-layer
-      ContentUri: layers/lambda-powertools
-      CompatibleRuntimes:
-        - nodejs20.x
 
   AdditionFunction:
     Type: AWS::Serverless::Function
