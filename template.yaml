@@ -13,7 +13,6 @@ Globals:
     Timeout: 10
     Runtime: nodejs20.x
     MemorySize: 128
-    Handler: index.handler
     Architectures:
       - arm64
 
@@ -49,7 +48,8 @@ Resources:
   AdditionFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: functions/addition
+      CodeUri: functions
+      Handler: addition/index.handler
       Events:
         AdditionEvent:
           Type: Api
@@ -63,7 +63,8 @@ Resources:
   SubstractionFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: functions/substraction
+      CodeUri: functions
+      Handler: substraction/index.handler
       Events:
         SubstractionEvent:
           Type: Api
