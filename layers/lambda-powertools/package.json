@@ -1,6 +1,7 @@
 {
   "name": "lambda-powertools",
   "version": "1.0.0",
+  "type": "module",
   "dependencies": {
     "@aws-lambda-powertools/logger": "^1.2.1",
     "@aws-lambda-powertools/metrics": "^1.2.1",

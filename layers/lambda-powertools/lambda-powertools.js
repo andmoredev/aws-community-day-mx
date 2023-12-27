@@ -1,23 +1,23 @@
-const { Logger, injectLambdaContext } = require('@aws-lambda-powertools/logger');
-const { Metrics, logMetrics } = require('@aws-lambda-powertools/metrics');
-const { Tracer, captureLambdaHandler } = require('@aws-lambda-powertools/tracer');
-const middy = require('@middy/core');
+import { Logger, injectLambdaContext } from '@aws-lambda-powertools/logger';
+import { Metrics, logMetrics } from '@aws-lambda-powertools/metrics';
+import { Tracer, captureLambdaHandler } from '@aws-lambda-powertools/tracer';
+import middy from '@middy/core';
 
-exports.logger = new Logger({
+export const logger = new Logger({
   persistentLogAttributes: {
     aws_account_id: process.env.AWS_ACCOUNT_ID || 'N/A',
     aws_region: process.env.AWS_REGION || 'N/A'
   }
 });
 
-exports.metrics = new Metrics({
+export const metrics = new Metrics({
   defaultDimensions: {
     aws_account_id: process.env.AWS_ACCOUNT_ID || 'N/A',
     aws_region: process.env.AWS_REGION || 'N/A'
   }
 });
 
-exports.tracer = new Tracer();
+export const tracer = new Tracer();
 
 const loggerOptions = {
   clearState: true,
@@ -28,9 +28,9 @@ const metricsOptions = {
   captureColdStartMetric: true
 };
 
-exports.initializePowertools = (handler) => {
+export const initializePowertools = (handler) => {
   return middy(handler)
-      .use(captureLambdaHandler(exports.tracer))
-      .use(logMetrics(exports.metrics, metricsOptions))
-      .use(injectLambdaContext(exports.logger, loggerOptions));
+      .use(captureLambdaHandler(tracer))
+      .use(logMetrics(metrics, metricsOptions))
+      .use(injectLambdaContext(logger, loggerOptions));
 };

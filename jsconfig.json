@@ -8,7 +8,7 @@
   "include": [
     "functions/**/*.js",
     "layers/*.js"
-  ],
+, "functions/addition/index.mjs", "functions/addition/tests/index.tests.mjs"  ],
   "exclude": [
     "node_modules",
     "**/node_modules/*"

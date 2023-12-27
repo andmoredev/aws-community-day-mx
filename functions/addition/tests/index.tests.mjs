@@ -1,10 +1,10 @@
-const app = require('../index.js');
-const { expect } = require('chai');
+import { expect } from 'chai';
+import { handler } from '../index.mjs';
 
 describe('Addition', () => {
   describe('handler', () => {
     it('Success - no warning', async () => {
-      const response = await app.handler({
+      const response = await handler({
         body: JSON.stringify({
           number1: 10,
           number2: 20
@@ -19,7 +19,7 @@ describe('Addition', () => {
     });
 
     it('Success - with warning', async () => {
-      const response = await app.handler({
+      const response = await handler({
         body: JSON.stringify({
           number1: 500,
           number2: 501

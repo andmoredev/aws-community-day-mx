@@ -11,7 +11,7 @@ Globals:
   Function:
     Tracing: Active
     Timeout: 10
-    Runtime: nodejs18.x
+    Runtime: nodejs20.x
     MemorySize: 128
     Handler: index.handler
     Layers:
