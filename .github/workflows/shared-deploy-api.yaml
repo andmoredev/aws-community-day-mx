@@ -12,6 +12,10 @@ on:
       TABLE_NAME:
         type: string
         required: true
+    outputs:
+      API_BASE_URL:
+        description: Base URL for the API that got deployed
+        value: ${{ jobs.build-and-deploy.outputs.API_BASE_URL }}
 
 permissions:
   id-token: write
@@ -22,6 +26,8 @@ jobs:
     name: Build and Deploy SAM Application
     runs-on: ubuntu-latest
     environment: ${{ inputs.WORKFLOW_ENV }}
+    outputs:
+      API_BASE_URL: ${{ steps.getStackOutputs.outputs.API_BASE_URL }}
     steps:
       - uses: actions/checkout@v4
 
@@ -53,3 +59,13 @@ jobs:
           --s3-bucket ${{ secrets.ARTIFACTS_BUCKET_NAME }} \
           --no-fail-on-empty-changeset \
           --role-arn ${{ secrets.CLOUDFORMATION_EXECUTION_ROLE }}
+
+      - id: getStackOutputs
+        name: Get Stack Outputs
+        run: |
+          url=$(aws cloudformation describe-stacks --stack-name ${{ inputs.STACK_NAME }} --query "Stacks[0].Outputs[?OutputKey=='ApiURL'].OutputValue" --output text)
+
+          echo "# API" >> $GITHUB_STEP_SUMMARY
+          echo "* API - $url" >> $GITHUB_STEP_SUMMARY
+
+          echo "API_BASE_URL=$url" >> $GITHUB_OUTPUT

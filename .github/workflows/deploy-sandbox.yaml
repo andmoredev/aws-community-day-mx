@@ -55,19 +55,19 @@ jobs:
           echo "TABLE_NAME=$stackNamePlusPrNumber" >> $GITHUB_OUTPUT
           echo "### Table Name (Dependabot) $stackNamePlusPrNumber" >> $GITHUB_STEP_SUMMARY
 
-  determine-if-openapi-changed:
-    name: Did OpenAPI Change
-    runs-on: ubuntu-latest
-    outputs:
-      openapi: ${{ steps.determine-if-openapi-changed.outputs.openapi }}
-    steps:
-    - uses: actions/checkout@v4
+  # determine-if-openapi-changed:
+  #   name: Did OpenAPI Change
+  #   runs-on: ubuntu-latest
+  #   outputs:
+  #     openapi: ${{ steps.determine-if-openapi-changed.outputs.openapi }}
+  #   steps:
+  #   - uses: actions/checkout@v4
 
-    - uses: dorny/paths-filter@v2
-      id: determine-if-openapi-changed
-      with:
-        filters: |
-          openapi: 'openapi.yaml'
+  #   - uses: dorny/paths-filter@v2
+  #     id: determine-if-openapi-changed
+  #     with:
+  #       filters: |
+  #         openapi: 'openapi.yaml'
 
   deploy-api:
     name: Deploy API
@@ -79,93 +79,67 @@ jobs:
       TABLE_NAME: ${{ needs.get-parameter-data.outputs.TABLE_NAME }}
     secrets: inherit
 
-  generate-js-sdk:
-    name: Generate JS SDK
-    runs-on: ubuntu-latest
-    needs: [determine-if-openapi-changed]
-    steps:
-      - uses: actions/checkout@v4
-      - if: ${{ needs.determine-if-openapi-changed.outputs.openapi == 'true' }}
-        name: Generate Node SDK
-        uses: openapi-generators/openapitools-generator-action@v1.5.0
-        with:
-          generator: typescript-node
-          openapi-file: openapi.yaml
-
-  get-api-url:
-    name: Get API Url
-    needs: [deploy-api, get-parameter-data]
-    runs-on: ubuntu-latest
-    environment: sandbox
-    outputs:
-      BASE_URL: ${{ steps.getUrl.outputs.BASE_URL }}
-    steps:
-      - name: Configure AWS
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-region: ${{ vars.AWS_REGION }}
-          role-to-assume: ${{ secrets.PIPELINE_EXECUTION_ROLE }}
-          role-session-name: get-api-url
-          role-duration-seconds: 3600
-          role-skip-session-tagging: true
-      - id: getUrl
-        name: Get Url
-        run: |
-          url=$(aws cloudformation describe-stacks --stack-name ${{ needs.get-parameter-data.outputs.STACK_NAME }} --query "Stacks[0].Outputs[?OutputKey=='ApiURL'].OutputValue" --output text)
-          echo $url
-
-          echo "BASE_URL=$url" >> "$GITHUB_OUTPUT"
-
-          echo "### Generated URLs" >> $GITHUB_STEP_SUMMARY
-          echo "API $url" >> $GITHUB_STEP_SUMMARY
+  # generate-js-sdk:
+  #   name: Generate JS SDK
+  #   runs-on: ubuntu-latest
+  #   needs: [determine-if-openapi-changed]
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - if: ${{ needs.determine-if-openapi-changed.outputs.openapi == 'true' }}
+  #       name: Generate Node SDK
+  #       uses: openapi-generators/openapitools-generator-action@v1.5.0
+  #       with:
+  #         generator: typescript-node
+  #         openapi-file: openapi.yaml
 
   postdeploy-validations:
     name: Post-deploy validations
-    needs: [get-api-url, generate-js-sdk]
+    needs: [deploy-api]
+    # needs: [deploy-api, generate-js-sdk]
     uses: ./.github/workflows/shared-post-deploy-validations.yaml
     with:
-      BASE_URL: ${{ needs.get-api-url.outputs.BASE_URL }}
+      BASE_URL: ${{ needs.deploy-api.outputs.API_BASE_URL }}
     secrets: inherit
 
-  auto-merge-dependabot-update:
-    name: Auto Merge Dependabot Update
-    needs: [postdeploy-validations]
-    if: ${{ github.actor == 'dependabot[bot]' && github.event_name == 'pull_request' }}
-    runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
-      contents: write
-    steps:
-      - name: Dependabot metadata
-        id: dependabot-metadata
-        uses: dependabot/fetch-metadata@v1
-        with:
-          compat-lookup: true
-          alert-lookup: true
-      - uses: actions/checkout@v4
-      - name: Approve a PR if not already approved
-        if: ${{ steps.dependabot-metadata.outputs.update-type == 'version-update:semver-minor' || steps.dependabot-metadata.outputs.update-type == 'version-update:semver-patch' || steps.dependabot-metadata.outputs.package-ecosystem == 'github_actions' }}
-        env:
-          PR_URL: ${{ github.event.pull_request.html_url }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh pr checkout "$PR_URL" # sets the upstream metadata for `gh pr status`
+  # auto-merge-dependabot-update:
+  #   name: Auto Merge Dependabot Update
+  #   needs: [postdeploy-validations]
+  #   if: ${{ github.actor == 'dependabot[bot]' && github.event_name == 'pull_request' }}
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     pull-requests: write
+  #     contents: write
+  #   steps:
+  #     - name: Dependabot metadata
+  #       id: dependabot-metadata
+  #       uses: dependabot/fetch-metadata@v1
+  #       with:
+  #         compat-lookup: true
+  #         alert-lookup: true
+  #     - uses: actions/checkout@v4
+  #     - name: Approve a PR if not already approved
+  #       if: ${{ steps.dependabot-metadata.outputs.update-type == 'version-update:semver-minor' || steps.dependabot-metadata.outputs.update-type == 'version-update:semver-patch' || steps.dependabot-metadata.outputs.package-ecosystem == 'github_actions' }}
+  #       env:
+  #         PR_URL: ${{ github.event.pull_request.html_url }}
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #       run: |
+  #         gh pr checkout "$PR_URL" # sets the upstream metadata for `gh pr status`
 
-          if [ "$(gh pr status --json reviewDecision -q .currentBranch.reviewDecision)" != "APPROVED" ]; then
-            gh pr review --approve "$PR_URL"
-          fi
+  #         if [ "$(gh pr status --json reviewDecision -q .currentBranch.reviewDecision)" != "APPROVED" ]; then
+  #           gh pr review --approve "$PR_URL"
+  #         fi
 
-          gh pr merge --auto --merge "$PR_URL"
+  #         gh pr merge --auto --merge "$PR_URL"
 
-  cleanup-dependabot-stack:
-    name: Cleanup dependabot stack
-    needs: [get-parameter-data, auto-merge-dependabot-update]
-    if: ${{ github.actor == 'dependabot[bot]' && github.event_name == 'pull_request' }}
-    uses: ./.github/workflows/cleanup-sandbox.yaml
-    permissions:
-      pull-requests: write
-      contents: read
-      id-token: write
-    with:
-      STACK_NAME: ${{ needs.get-parameter-data.outputs.STACK_NAME }}
-    secrets: inherit
+  # cleanup-dependabot-stack:
+  #   name: Cleanup dependabot stack
+  #   needs: [get-parameter-data, auto-merge-dependabot-update]
+  #   if: ${{ github.actor == 'dependabot[bot]' && github.event_name == 'pull_request' }}
+  #   uses: ./.github/workflows/cleanup-sandbox.yaml
+  #   permissions:
+  #     pull-requests: write
+  #     contents: read
+  #     id-token: write
+  #   with:
+  #     STACK_NAME: ${{ needs.get-parameter-data.outputs.STACK_NAME }}
+  #   secrets: inherit
